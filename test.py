@@ -1,0 +1,2 @@
+kupa = []
+print(len.kupa)
