@@ -78,8 +78,9 @@ class Check(commands.Cog):
     def cog_unload(self):
         self.printer.cancel()
 
-    @tasks.loop(minutes=1.0)
+    @tasks.loop(seconds=10)
     async def printer(self):
+        print(datetime.now().isoformat())
         new_data=[]
         with open('data.csv', mode='r') as data_file:
             data_reader = csv.DictReader(data_file)
