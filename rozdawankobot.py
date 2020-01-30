@@ -26,7 +26,7 @@ async def giveaway(ctx, game: str, platform: str, time:int):
         print(ctx.message.id)
         emoji = "🧅"
         await mesg.add_reaction(emoji)
-        end_date = datetime.now() + timedelta(seconds=time)
+        end_date = datetime.now() + timedelta(hours=time)
         with open('data.csv', mode='a', newline='') as data_file:
             data_writer = csv.writer(data_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             fields = ['{}'.format(game), '{}'.format(platform), '{}'.format(end_date.isoformat()),'{}'.format(mesg.id),'{}'.format(ctx.message.id),'{}'.format(ctx.author.display_name)]
@@ -78,7 +78,7 @@ class Check(commands.Cog):
     def cog_unload(self):
         self.printer.cancel()
 
-    @tasks.loop(seconds=10)
+    @tasks.loop(minutes=1)
     async def printer(self):
         try:        
             print(datetime.now().isoformat())
