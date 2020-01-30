@@ -57,7 +57,7 @@ async def del_giveaway(ctx):
 
     os.remove("data.csv")
     os.rename("data2.csv","data.csv")
-    channel = bot.get_channel(669878320413933570)
+    channel = bot.get_channel(640335135144935429)
     message = await channel.fetch_message(int(row["id"]))
     await message.unpin()
     await channel.send("Skasowałem i odpiąłem twoje ostatnie losowanie!")
@@ -65,7 +65,7 @@ async def del_giveaway(ctx):
 
 @bot.event
 async def on_command_error(ctx, error):
-    channel = bot.get_channel(669878320413933570)
+    channel = bot.get_channel(640335135144935429)
     print(error)
     await channel.send('Ups, coś poszło nie tak! Sprawdź "!help rozdajo" żeby zobaczyć jak dodać losowanie!') 
 
@@ -89,7 +89,7 @@ class Check(commands.Cog):
                     try:
                         if datetime.now() > datetime.fromisoformat(row["time"]):
                             row["time"] = "FINISHED"
-                            channel = bot.get_channel(669878320413933570)
+                            channel = bot.get_channel(640335135144935429)
                             message = await channel.fetch_message(int(row["id"]))
                             reaction = message.reactions[0]
                             losu_losu = await reaction.users().flatten()
@@ -133,7 +133,7 @@ class Check(commands.Cog):
                 if row["time"] != "FINISHED":
                     giveaway_count += 1
             if giveaway_count > 0:
-                channel = bot.get_channel(669878320413933570)
+                channel = bot.get_channel(640335135144935429)
                 await  channel.send("🧅Hej, w tej chwili odbywa się następująca liczba głosowań : {}. Sprawdźcie przypięte wiadomości!🧅".format(giveaway_count))
     
 
