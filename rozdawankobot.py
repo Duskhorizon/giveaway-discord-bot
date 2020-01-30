@@ -80,45 +80,49 @@ class Check(commands.Cog):
 
     @tasks.loop(seconds=10)
     async def printer(self):
-        print(datetime.now().isoformat())
-        new_data=[]
-        with open('data.csv', mode='r') as data_file:
-            data_reader = csv.DictReader(data_file)
-            for row in data_reader:
-                try:
-                    if datetime.now() > datetime.fromisoformat(row["time"]):
-                        row["time"] = "FINISHED"
-                        channel = bot.get_channel(669878320413933570)
-                        message = await channel.fetch_message(int(row["id"]))
-                        reaction = message.reactions[0]
-                        losu_losu = await reaction.users().flatten()
-                        if len(losu_losu) == 1:
-                             await channel.send("🧅Nikt się nie zgłosił do losowania : {}. Straciliście prawo do miana cebularzy! 🧅".format(row["game"]))
-                             await message.unpin()
-                             break
-                        winner = random.choice(losu_losu)
-                        while winner.bot == True:
+        try:        
+            print(datetime.now().isoformat())
+            new_data=[]
+            with open('data.csv', mode='r') as data_file:
+                data_reader = csv.DictReader(data_file)
+                for row in data_reader:
+                    try:
+                        if datetime.now() > datetime.fromisoformat(row["time"]):
+                            row["time"] = "FINISHED"
+                            channel = bot.get_channel(669878320413933570)
+                            message = await channel.fetch_message(int(row["id"]))
+                            reaction = message.reactions[0]
+                            losu_losu = await reaction.users().flatten()
+                            if len(losu_losu) == 1:
+                                await channel.send("🧅Nikt się nie zgłosił do losowania : {}. Straciliście prawo do miana cebularzy! 🧅".format(row["game"]))
+                                await message.unpin()
+                                break
                             winner = random.choice(losu_losu)
-                        santamessage = await channel.fetch_message(int(row["santaid"]))
-                        santa = santamessage.author
-                        await channel.send("🧅Losowanie {} zakończone! Gratulacje {}, napisz do {} w celu dobioru nagrody 🧅".format(row["game"], winner.mention, santa.mention))
-                        await message.unpin()
-                except:
-                    pass                    
-                new_data.append(row)
-                print(row)
+                            while winner.bot == True:
+                                winner = random.choice(losu_losu)
+                            santamessage = await channel.fetch_message(int(row["santaid"]))
+                            santa = santamessage.author
+                            await channel.send("🧅Losowanie {} zakończone! Gratulacje {}, napisz do {} w celu dobioru nagrody 🧅".format(row["game"], winner.mention, santa.mention))
+                            await message.unpin()
+                    except:
+                        pass                    
+                    new_data.append(row)
+                    print(row)
 
-        with open('data2.csv', mode='w+', newline='') as data_file2:
-            print('check')
-            fieldnames = ['game','platform','time','id','santaid','santa']
-            data_writer = csv.DictWriter(data_file2, fieldnames = fieldnames)
-            print('check2')
-            data_writer.writeheader()
-            for new_row in new_data:
-                data_writer.writerow(new_row)
+            with open('data2.csv', mode='w+', newline='') as data_file2:
+                print('check')
+                fieldnames = ['game','platform','time','id','santaid','santa']
+                data_writer = csv.DictWriter(data_file2, fieldnames = fieldnames)
+                print('check2')
+                data_writer.writeheader()
+                for new_row in new_data:
+                    data_writer.writerow(new_row)
 
-        os.remove("data.csv")
-        os.rename("data2.csv","data.csv")
+            os.remove("data.csv")
+            os.rename("data2.csv","data.csv")
+        except Exception as e:
+            print(e)
+            print(e.message)            
 
     @tasks.loop(hours=12.0)
     async def check(self):
