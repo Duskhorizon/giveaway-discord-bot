@@ -23,10 +23,9 @@ async def giveaway(ctx, game: str, platform: str, time:int):
         embed.add_field(name="Koniec za:", value="{} godzin od posta do losowania".format(str(time)), inline=True)
         embed.set_footer(text="Jeśli jesteś zainteresowany kliknij ikonkę polskiej trufli")
         mesg = await ctx.send(embed=embed)
-        print(ctx.message.id)
         emoji = "🧅"
         await mesg.add_reaction(emoji)
-        end_date = datetime.now() + timedelta(hours=time)
+        end_date = datetime.now() + timedelta(seconds=time)
         with open('data.csv', mode='a', newline='') as data_file:
             data_writer = csv.writer(data_file, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             fields = ['{}'.format(game), '{}'.format(platform), '{}'.format(end_date.isoformat()),'{}'.format(mesg.id),'{}'.format(ctx.message.id),'{}'.format(ctx.author.display_name)]
@@ -57,7 +56,7 @@ async def del_giveaway(ctx):
 
     os.remove("data.csv")
     os.rename("data2.csv","data.csv")
-    channel = bot.get_channel(640335135144935429)
+    channel = bot.get_channel(669878320413933570)
     message = await channel.fetch_message(int(row["id"]))
     await message.unpin()
     await channel.send("Skasowałem i odpiąłem twoje ostatnie losowanie!")
@@ -65,7 +64,7 @@ async def del_giveaway(ctx):
 
 @bot.event
 async def on_command_error(ctx, error):
-    channel = bot.get_channel(640335135144935429)
+    channel = bot.get_channel(669878320413933570)
     print(error)
     await channel.send('Ups, coś poszło nie tak! Sprawdź "!help rozdajo" żeby zobaczyć jak dodać losowanie!') 
 
@@ -73,12 +72,14 @@ class Check(commands.Cog):
     def __init__(self,bot):
         self.index = 0
         self.printer.start()
+        self.check.start()
         self.bot = bot
 
     def cog_unload(self):
         self.printer.cancel()
+        self.check.cancel()
 
-    @tasks.loop(minutes=1)
+    @tasks.loop(seconds=2)
     async def printer(self):
         try:        
             print(datetime.now().isoformat())
@@ -89,7 +90,7 @@ class Check(commands.Cog):
                     try:
                         if datetime.now() > datetime.fromisoformat(row["time"]):
                             row["time"] = "FINISHED"
-                            channel = bot.get_channel(640335135144935429)
+                            channel = bot.get_channel(669878320413933570)
                             message = await channel.fetch_message(int(row["id"]))
                             reaction = message.reactions[0]
                             losu_losu = await reaction.users().flatten()
@@ -107,13 +108,10 @@ class Check(commands.Cog):
                     except:
                         pass                    
                     new_data.append(row)
-                    print(row)
 
             with open('data2.csv', mode='w+', newline='') as data_file2:
-                print('check')
                 fieldnames = ['game','platform','time','id','santaid','santa']
                 data_writer = csv.DictWriter(data_file2, fieldnames = fieldnames)
-                print('check2')
                 data_writer.writeheader()
                 for new_row in new_data:
                     data_writer.writerow(new_row)
@@ -124,18 +122,23 @@ class Check(commands.Cog):
             print(e)
             print(e.message)            
 
-    @tasks.loop(hours=12.0)
+    @tasks.loop(minutes=1)
     async def check(self):
-        giveaway_count = 0
-        with open('data.csv', mode='r') as data_file:
-            data_reader = csv.DictReader(data_file)
-            for row in data_reader:
-                if row["time"] != "FINISHED":
-                    giveaway_count += 1
-            if giveaway_count > 0:
-                channel = bot.get_channel(640335135144935429)
-                await  channel.send("🧅Hej, w tej chwili odbywa się następująca liczba głosowań : {}. Sprawdźcie przypięte wiadomości!🧅".format(giveaway_count))
-    
+        try:
+            print('sprawdzanko')
+            giveaway_count = 0
+            with open('data.csv', mode='r') as data_file:
+                data_reader = csv.DictReader(data_file)
+                for row in data_reader:
+                    if row["time"] != "FINISHED":
+                        giveaway_count += 1
+                if giveaway_count > 0:
+                    channel = bot.get_channel(669878320413933570)
+                    await  channel.send("🧅Hej, w tej chwili odbywa się następująca liczba głosowań : {}. Sprawdźcie przypięte wiadomości!🧅".format(giveaway_count))
+        except Exception as e:
+            print('sprawdzanko error')
+            print(e)
+            print(e.message)     
 
 bot.add_cog(Check(bot))
 bot.run(token)
