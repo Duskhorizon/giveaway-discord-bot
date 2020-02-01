@@ -10,7 +10,7 @@ import traceback
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
 
-bot = commands.Bot(command_prefix='!')
+bot = commands.Bot(command_prefix='&')
 
 
 @bot.command(name='rozdajo', brief='Tworzy nowe losowanie', help='Tworzy nowe losowanie', usage ='"Gra" "Platforma" "Czas do losowania w godzinach"')
@@ -63,11 +63,11 @@ async def del_giveaway(ctx):
     await channel.send("Skasowałem i odpiąłem twoje ostatnie losowanie!")
 
 
-@bot.event
-async def on_command_error(ctx, error):
-    channel = bot.get_channel(640335135144935429)
-    print(error)
-    await channel.send('Ups, coś poszło nie tak! Sprawdź "!help rozdajo" żeby zobaczyć jak dodać losowanie!') 
+# @bot.event
+# async def on_command_error(ctx, error):
+#     channel = bot.get_channel(640335135144935429)
+#     print(error)
+#     await channel.send('Ups, coś poszło nie tak! Sprawdź "!help rozdajo" żeby zobaczyć jak dodać losowanie!') 
 
 class Check(commands.Cog):
     def __init__(self,bot):
